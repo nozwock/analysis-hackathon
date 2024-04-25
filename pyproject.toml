@@ -1,9 +1,12 @@
 [tool.poetry]
-name = "analysis-hackathon"
+name = "analysis-hackfest"
 version = "0.1.0"
 description = ""
 authors = ["nozwock"]
 readme = "README.md"
+
+[tool.poetry.scripts]
+analysis-hackfest = 'analysis_hackfest.__main__:run'
 
 [tool.poetry.dependencies]
 python = "^3.11"

@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 
-from analysis_hackathon.models.solar_power import SolarPowerRegressor
+from analysis_hackfest.models.solar_power import SolarPowerRegressor
 
 
 @st.cache_resource
