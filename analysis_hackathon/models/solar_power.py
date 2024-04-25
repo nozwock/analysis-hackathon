@@ -130,4 +130,4 @@ if __name__ == "__main__":
         {sess.get_inputs()[0].name: X_test.to_numpy()[:10]},
     )
 
-    print("Score: {}%".format(round(r2_score(preds, Y_test[:10]) * 100, 2)))
+    print(f"Score: {np.round(r2_score(preds, Y_test[:10]) * 100, 2)}%")
