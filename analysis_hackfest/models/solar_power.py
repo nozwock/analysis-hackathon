@@ -1,3 +1,4 @@
+import logging
 from importlib.resources import files
 from pathlib import Path
 from typing import Any
@@ -5,15 +6,15 @@ from typing import Any
 import numpy as np
 import onnxruntime
 import pandas as pd
-import skl2onnx
-from onnx.onnx_ml_pb2 import ModelProto
-from skl2onnx.common.data_types import FloatTensorType
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
 from .. import assets
 from . import ModelProtocol
+
+logger = logging.getLogger(__name__)
 
 SOLAR_POWER_REGRESSOR_MODEL_PATH = Path(
     str(files(assets).joinpath("solar-power-regressor.onnx"))
@@ -71,10 +72,17 @@ class SolarPowerRegressor(ModelProtocol):
 
     def get_model(self) -> RandomForestRegressor:
         if self.model is None:
+            logger.info(f"{self.model=}, Generating a new model")
             X_train, X_test, Y_train, Y_test = self.get_split_dataset()
 
             model = RandomForestRegressor()
             model.fit(X_train, Y_train)
+
+            Y_pred = model.predict(X_test)
+            rmse = mean_squared_error(Y_test, Y_pred) ** (1 / 2)
+            r2 = r2_score(Y_pred, Y_test)
+            logger.debug(f"{rmse=}, {r2=}")
+
             self.model = model
 
         return self.model
@@ -82,48 +90,15 @@ class SolarPowerRegressor(ModelProtocol):
     def try_load_model(
         self, path: Path = SOLAR_POWER_REGRESSOR_MODEL_PATH
     ) -> onnxruntime.InferenceSession | None:
-        if self.stored_model is None:
-            self.stored_model = (
-                onnxruntime.InferenceSession(
-                    path, providers=onnxruntime.get_available_providers()
-                )
-                if path.is_file()
-                else None
-            )
-        return self.stored_model
+        return super().try_load_model(path)
 
     def load_model(
         self, path: Path = SOLAR_POWER_REGRESSOR_MODEL_PATH
     ) -> onnxruntime.InferenceSession:
-        if self.stored_model is None:
-            if (ret := self.try_load_model(path)) is None:
-                self.store_model()
-                ret = self.try_load_model(path)
+        return super().load_model(path)
 
-            self.stored_model = ret
-
-        assert self.stored_model is not None
-
-        return self.stored_model
-
-    def store_model(self, path: Path = SOLAR_POWER_REGRESSOR_MODEL_PATH) -> bool:
-        if self.model is None:
-            model = self.get_model()
-            assert self.input_features is not None
-
-            onnx_model = skl2onnx.to_onnx(
-                model,
-                initial_types=[("input", FloatTensorType([None, self.input_features]))],
-            )
-
-            match onnx_model:
-                case ModelProto():
-                    with open(path, "wb") as f:
-                        f.write(onnx_model.SerializeToString())
-                case _:
-                    return False
-
-        return True
+    def store_model(self, path: Path = SOLAR_POWER_REGRESSOR_MODEL_PATH) -> None:
+        return super().store_model(path)
 
 
 # Run via:
@@ -135,9 +110,10 @@ if __name__ == "__main__":
     sess = model.load_model()
 
     _, X_test, _, Y_test = model.get_split_dataset()
-    preds = sess.run(
+    Y_pred = sess.run(
         [sess.get_outputs()[0].name],
-        {sess.get_inputs()[0].name: X_test.to_numpy()[:10]},
+        {sess.get_inputs()[0].name: X_test.to_numpy()[:100]},
     )[0]
 
-    print(f"Score: {np.round(r2_score(preds, Y_test[:10]) * 100, 2)}%")
+    r2 = r2_score(Y_pred, Y_test[:100])
+    print(f"{r2=}")
