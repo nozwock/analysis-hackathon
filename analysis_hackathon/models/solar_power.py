@@ -79,7 +79,7 @@ class SolarPowerRegressor(ModelProtocol):
 
         return self.model
 
-    def load_model(
+    def try_load_model(
         self, path: Path = SOLAR_POWER_REGRESSOR_MODEL_PATH
     ) -> onnxruntime.InferenceSession | None:
         if self.stored_model is None:
@@ -90,6 +90,20 @@ class SolarPowerRegressor(ModelProtocol):
                 if path.is_file()
                 else None
             )
+        return self.stored_model
+
+    def load_model(
+        self, path: Path = SOLAR_POWER_REGRESSOR_MODEL_PATH
+    ) -> onnxruntime.InferenceSession:
+        if self.stored_model is None:
+            if (ret := self.try_load_model(path)) is None:
+                self.store_model()
+                ret = self.try_load_model(path)
+
+            self.stored_model = ret
+
+        assert self.stored_model is not None
+
         return self.stored_model
 
     def store_model(self, path: Path = SOLAR_POWER_REGRESSOR_MODEL_PATH) -> bool:
@@ -118,16 +132,12 @@ if __name__ == "__main__":
     from sklearn.metrics import r2_score
 
     model = SolarPowerRegressor()
+    sess = model.load_model()
 
-    if (sess := model.load_model()) is None:
-        model.store_model()
-        sess = model.load_model()
-
-    assert sess is not None
     _, X_test, _, Y_test = model.get_split_dataset()
-    preds, *_ = sess.run(
+    preds = sess.run(
         [sess.get_outputs()[0].name],
         {sess.get_inputs()[0].name: X_test.to_numpy()[:10]},
-    )
+    )[0]
 
     print(f"Score: {np.round(r2_score(preds, Y_test[:10]) * 100, 2)}%")
