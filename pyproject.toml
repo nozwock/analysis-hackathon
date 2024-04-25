@@ -8,6 +8,10 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 streamlit = "^1.33.0"
+pandas = "^2.2.2"
+numpy = "^1.26.4"
+skl2onnx = "^1.16.0"
+onnxruntime = "^1.17.3"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -23,6 +27,7 @@ tensorflow = "^2.16.1"
 folium = "^0.16.0"
 geopandas = "^0.14.3"
 scipy = "^1.13.0"
+missingno = "^0.5.2"
 
 [build-system]
 requires = ["poetry-core"]
