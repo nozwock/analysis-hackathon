@@ -55,7 +55,7 @@ Y_test.reset_index(drop=True, inplace=True)
 data_sample, series_sample = cached_samples()
 
 st.write("""
-    # Solar Power Generation Prediction
+    # Solar Power Generation
 """)
 
 st.write("### Dataset Sample")

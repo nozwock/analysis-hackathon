@@ -11,10 +11,8 @@ main_page = st.navigation(
             ),
         ],
         "Prediction": [
-            st.Page("app_pages/co2_emission_prediction.py", title="CO2 Emission"),
-            st.Page(
-                "app_pages/solar_power_prediction.py", title="Solar Power Generation"
-            ),
+            st.Page("app_pages/co2_emission.py", title="CO2 Emission"),
+            st.Page("app_pages/solar_power.py", title="Solar Power Generation"),
         ],
     }
 )
