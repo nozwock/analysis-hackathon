@@ -32,6 +32,7 @@ class SolarPowerRegressor(ModelProtocol):
 
     def get_dataset(self) -> pd.DataFrame:
         if self.dataset is None:
+            logger.info("Creating dataset")
             generation_data = pd.read_csv(GENERATION_DATA_PATH)
             weather_data = pd.read_csv(WEATHER_DATA_PATH)
 
@@ -72,7 +73,7 @@ class SolarPowerRegressor(ModelProtocol):
 
     def get_model(self) -> RandomForestRegressor:
         if self.model is None:
-            logger.info(f"{self.model=}, Generating a new model")
+            logger.info("Generating model")
             X_train, X_test, Y_train, Y_test = self.get_split_dataset()
 
             model = RandomForestRegressor()
@@ -104,7 +105,7 @@ class SolarPowerRegressor(ModelProtocol):
 # Run via:
 # python -m analysis_hackathon.models.solar_power
 if __name__ == "__main__":
-    from sklearn.metrics import r2_score
+    logging.basicConfig(level=logging.DEBUG)
 
     model = SolarPowerRegressor()
     sess = model.load_model()

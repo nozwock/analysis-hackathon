@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Generic, Protocol, TypeVar
@@ -6,6 +7,8 @@ import onnxruntime
 import skl2onnx
 from onnx.onnx_ml_pb2 import ModelProto
 from skl2onnx.common.data_types import FloatTensorType
+
+logger = logging.getLogger(__name__)
 
 T = TypeVar("T")
 U = TypeVar("U")
@@ -26,13 +29,11 @@ class ModelProtocol(Protocol, Generic[T, U, V]):
 
     def try_load_model(self, path: Path) -> onnxruntime.InferenceSession | None:
         if self.stored_model is None:
-            self.stored_model = (
-                onnxruntime.InferenceSession(
+            if path.is_file():
+                logger.info(f"Loading model from '{path}'")
+                self.stored_model = onnxruntime.InferenceSession(
                     path, providers=onnxruntime.get_available_providers()
                 )
-                if path.is_file()
-                else None
-            )
         return self.stored_model
 
     def load_model(self, path: Path) -> onnxruntime.InferenceSession:
@@ -52,6 +53,7 @@ class ModelProtocol(Protocol, Generic[T, U, V]):
             model = self.get_model()
             assert self.input_features is not None
 
+            logger.info(f"Serializing {type(self.model)!r} to ONNX")
             onnx_model = skl2onnx.to_onnx(
                 model,
                 initial_types=[("input", FloatTensorType([None, self.input_features]))],
