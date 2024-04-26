@@ -6,9 +6,7 @@ main_page = st.navigation(
             st.Page(
                 "app_pages/home.py", title="Home", default=True, icon=":material/home:"
             ),
-            st.Page(
-                "app_pages/future.py", title="Future", icon=":material/star_border:"
-            ),
+            st.Page("app_pages/future.py", title="Future", icon=":material/star:"),
         ],
         "Prediction": [
             st.Page("app_pages/co2_emission.py", title="CO2 Emission"),
