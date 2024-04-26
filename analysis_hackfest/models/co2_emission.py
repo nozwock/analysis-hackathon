@@ -14,7 +14,7 @@ from sklearn.model_selection import (
     train_test_split,
 )
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import LabelEncoder, StandardScaler
 
 from .. import assets
 from . import ModelProtocol
@@ -36,6 +36,7 @@ class Co2EmissionRegressor(ModelProtocol):
 
     def get_dataset(self) -> pd.DataFrame:
         if self.dataset is None:
+            logger.info("Creating dataset")
             df = pd.read_csv(FUEL_CONSUMPTION_DATA_PATH)
             df.drop(columns=["MODEL_YEAR"], inplace=True)
 
@@ -48,21 +49,25 @@ class Co2EmissionRegressor(ModelProtocol):
 
             # Encoding only fuel type, vehicle class and Transmission out of all the non-numeric features
             # using pd.get_dummies since the rest contain too many unique values and will increase the feature so much
-            df.drop(columns=["MAKE", "MODEL", "TRANSMISSION"], inplace=True)
-            fuel_type_encoded = pd.get_dummies(
-                df["FUEL_TYPE"], prefix="FUEL", drop_first=True
-            )
-            vehicle_class_encoded = pd.get_dummies(
-                df["VEHICLE_CLASS"], prefix="VEHICLE", drop_first=True
-            )
-            df.drop(columns=["FUEL_TYPE", "VEHICLE_CLASS"], axis=1, inplace=True)
-            df_encoded = pd.concat(
-                [df, fuel_type_encoded, vehicle_class_encoded], axis=1
-            )
+            # df.drop(columns=["MAKE", "MODEL", "TRANSMISSION"], inplace=True)
+            # fuel_type_encoded = pd.get_dummies(
+            #     df["FUEL_TYPE"], prefix="FUEL", drop_first=True
+            # )
+            # vehicle_class_encoded = pd.get_dummies(
+            #     df["VEHICLE_CLASS"], prefix="VEHICLE", drop_first=True
+            # )
+            # df.drop(columns=["FUEL_TYPE", "VEHICLE_CLASS"], axis=1, inplace=True)
+            # df = pd.concat(
+            #     [df, fuel_type_encoded, vehicle_class_encoded], axis=1
+            # )
 
-            df_encoded.drop_duplicates(keep="first", inplace=True)
+            label_encoder = LabelEncoder()
+            for it in ("FUEL_TYPE", "VEHICLE_CLASS", "MAKE", "MODEL", "TRANSMISSION"):
+                df[it] = label_encoder.fit_transform(df[it])
 
-            self.dataset = df_encoded
+            df.drop_duplicates(keep="first", inplace=True)
+
+            self.dataset = df
 
         return self.dataset
 
@@ -83,7 +88,7 @@ class Co2EmissionRegressor(ModelProtocol):
 
     def get_model(self) -> Pipeline:
         if self.model is None:
-            logger.info(f"{self.model=}, Generating a new model")
+            logger.info("Generating model")
 
             X_train, X_test, Y_train, Y_test = self.get_split_dataset()
 
@@ -121,6 +126,8 @@ class Co2EmissionRegressor(ModelProtocol):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
+
     model = Co2EmissionRegressor()
     sess = model.load_model()
 
