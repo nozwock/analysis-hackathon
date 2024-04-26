@@ -6,7 +6,8 @@ from pathlib import Path
 def run():
     try:
         subprocess.run(
-            ["streamlit", "run", "Home.py", *sys.argv[1:]], cwd=Path(__file__).parent
+            ["streamlit", "run", "app.py", *sys.argv[1:]],
+            cwd=Path(__file__).parent,
         )
     except KeyboardInterrupt:
         ...
