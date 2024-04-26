@@ -10,7 +10,7 @@ analysis-hackfest = 'analysis_hackfest.__main__:run'
 
 [tool.poetry.dependencies]
 python = "^3.11"
-streamlit = "^1.33.0"
+streamlit = {url = "https://github.com/streamlit/release-demos/raw/master/previews/mpa-v2/streamlit-1.33.0-py2.py3-none-any.whl"}
 pandas = "^2.2.2"
 numpy = "^1.26.4"
 scikit-learn = "^1.4.2"

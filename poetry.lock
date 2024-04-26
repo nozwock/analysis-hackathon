@@ -2988,10 +2988,9 @@ name = "streamlit"
 version = "1.33.0"
 description = "A faster way to build and share data apps"
 optional = false
-python-versions = "!=3.9.7,>=3.8"
+python-versions = ">=3.8, !=3.9.7"
 files = [
-    {file = "streamlit-1.33.0-py2.py3-none-any.whl", hash = "sha256:bfacb5d1edefcf803c2040b051a21b4c81317a9865448e6767d0a0c6aae7edae"},
-    {file = "streamlit-1.33.0.tar.gz", hash = "sha256:a8da8ff46f5b948c56d2dc7aca7a61cf8d995f4f21744cf82258ae75e63004ba"},
+    {file = "streamlit-1.33.0-py2.py3-none-any.whl", hash = "sha256:649ac640556e88d02327fbbaa9a10febb52e2ef6f745c78bbad3a2ca58e3b1df"},
 ]
 
 [package.dependencies]
@@ -3017,6 +3016,10 @@ watchdog = {version = ">=2.1.5", markers = "platform_system != \"Darwin\""}
 
 [package.extras]
 snowflake = ["snowflake-connector-python (>=2.8.0)", "snowflake-snowpark-python (>=0.9.0)"]
+
+[package.source]
+type = "url"
+url = "https://github.com/streamlit/release-demos/raw/master/previews/mpa-v2/streamlit-1.33.0-py2.py3-none-any.whl"
 
 [[package]]
 name = "streamlit-pydantic"
@@ -3489,4 +3492,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "132aea8be61fac479a0a067d4b030ccf819d084a99a2d2dfc54fae1da2057866"
+content-hash = "d7e61f1c14d6282d28309103eb63c4b1360fdce988992830f38b4f75d9c56162"
