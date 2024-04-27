@@ -1,6 +1,6 @@
-# Analysis? Hackfest
+# Hackfest Project
 
-## How to Run
+## Using
 
 - First make sure the project root is the work directory.
 - Using `pip`.
@@ -8,10 +8,10 @@
     - Install package and its dependencies and run it with:
         ```console
         python -m pip install -e .
-        analysis-hackathon
+        analysis-hackfest
         ```
 - Using `poertry`, install the project and run it with:
     ```console
     poetry install
-    poetry run -- analysis-hackathon
+    poetry run -- analysis-hackfest
     ```
